@@ -84,6 +84,7 @@ import static org.springframework.util.StringUtils.tokenizeToStringArray;
  *
  * @see #setConfigLocation
  * @see #setDataSource
+ * 主要是创建SqlSessionFactory
  */
 public class SqlSessionFactoryBean
     implements FactoryBean<SqlSessionFactory>, InitializingBean, ApplicationListener<ApplicationEvent> {
@@ -92,51 +93,51 @@ public class SqlSessionFactoryBean
 
   private static final ResourcePatternResolver RESOURCE_PATTERN_RESOLVER = new PathMatchingResourcePatternResolver();
   private static final MetadataReaderFactory METADATA_READER_FACTORY = new CachingMetadataReaderFactory();
-
+  //配置地址
   private Resource configLocation;
-
+  //mybatis配置项
   private Configuration configuration;
-
+  //映射xml文件配置地址
   private Resource[] mapperLocations;
-
+  //数据源:获取连接的
   private DataSource dataSource;
-
+  //
   private TransactionFactory transactionFactory;
-
+  //属性配置项
   private Properties configurationProperties;
-
+  //会话工厂构建
   private SqlSessionFactoryBuilder sqlSessionFactoryBuilder = new SqlSessionFactoryBuilder();
-
+  //会话工厂
   private SqlSessionFactory sqlSessionFactory;
 
   // EnvironmentAware requires spring 3.1
   private String environment = SqlSessionFactoryBean.class.getSimpleName();
 
   private boolean failFast;
-
+  //插件
   private Interceptor[] plugins;
-
+  //类型转换器数组
   private TypeHandler<?>[] typeHandlers;
-
+  //搜索类型转换器的包路径
   private String typeHandlersPackage;
-
+  //别名数组
   private Class<?>[] typeAliases;
-
+  //别名数组包路径
   private String typeAliasesPackage;
-
+  // todo 对于别名映射的一个扩展
   private Class<?> typeAliasesSuperType;
-
+  //脚本语言驱动
   private LanguageDriver[] scriptingLanguageDrivers;
-
+  //默认脚本语言驱动
   private Class<? extends LanguageDriver> defaultScriptingLanguageDriver;
 
   // issue #19. No default provider.
   private DatabaseIdProvider databaseIdProvider;
-
+  //虚拟文件系统
   private Class<? extends VFS> vfs;
-
+  //缓存
   private Cache cache;
-
+  //对象创建工厂
   private ObjectFactory objectFactory;
 
   private ObjectWrapperFactory objectWrapperFactory;
@@ -144,8 +145,8 @@ public class SqlSessionFactoryBean
   /**
    * Sets the ObjectFactory.
    *
-   * @since 1.1.2
-   * @param objectFactory
+     * @since 1.1.2
+    * @param objectFactory
    *          a custom ObjectFactory
    */
   public void setObjectFactory(ObjectFactory objectFactory) {
@@ -464,6 +465,7 @@ public class SqlSessionFactoryBean
 
   /**
    * {@inheritDoc}
+   * peng sqlSessionFactory构建入口
    */
   @Override
   public void afterPropertiesSet() throws Exception {
@@ -489,7 +491,7 @@ public class SqlSessionFactoryBean
   protected SqlSessionFactory buildSqlSessionFactory() throws Exception {
 
     final Configuration targetConfiguration;
-
+  //（1）如果configuration等于null，创建默认configuration
     XMLConfigBuilder xmlConfigBuilder = null;
     if (this.configuration != null) {
       targetConfiguration = this.configuration;
@@ -507,7 +509,7 @@ public class SqlSessionFactoryBean
       targetConfiguration = new Configuration();
       Optional.ofNullable(this.configurationProperties).ifPresent(targetConfiguration::setVariables);
     }
-
+    //（1）向targetConfiguration封装基本数据
     Optional.ofNullable(this.objectFactory).ifPresent(targetConfiguration::setObjectFactory);
     Optional.ofNullable(this.objectWrapperFactory).ifPresent(targetConfiguration::setObjectWrapperFactory);
     Optional.ofNullable(this.vfs).ifPresent(targetConfiguration::setVfsImpl);
@@ -602,7 +604,7 @@ public class SqlSessionFactoryBean
     } else {
       LOGGER.debug(() -> "Property 'mapperLocations' was not specified.");
     }
-
+    //通过封装的targetConfiguration构建会话工厂 DefaultSqlSessionFactory
     return this.sqlSessionFactoryBuilder.build(targetConfiguration);
   }
 

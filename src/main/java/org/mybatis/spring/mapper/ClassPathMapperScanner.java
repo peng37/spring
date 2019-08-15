@@ -45,7 +45,7 @@ import java.util.Set;
  *
  * @author Hunter Presnall
  * @author Eduardo Macarron
- * 
+ *
  * @see MapperFactoryBean
  * @since 1.2.0
  */
@@ -189,7 +189,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 
     return beanDefinitions;
   }
-
+  //spring对扫描到的mapper接口做转换
   private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
     GenericBeanDefinition definition;
     for (BeanDefinitionHolder holder : beanDefinitions) {
@@ -201,6 +201,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
       // the mapper interface is the original class of the bean
       // but, the actual class of the bean is MapperFactoryBean
       definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName); // issue #59
+      //将 BeanDefinition 中记录的 Bean 类型修改为 MapperFactoryBean
       definition.setBeanClass(this.mapperFactoryBeanClass);
 
       definition.getPropertyValues().add("addToConfig", this.addToConfig);
